@@ -254,9 +254,9 @@ export function AppShell({ children }: AppShellProps) {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="h-10 rounded-full border-white/10 bg-white/5 px-2 backdrop-blur-sm transition-all hover:bg-white/10 hover:shadow-glow-sm"
+                    className="flex h-10 shrink-0 items-center justify-center rounded-full border-white/10 bg-white/5 px-2 backdrop-blur-sm transition-all hover:bg-white/10 hover:shadow-glow-sm"
                   >
-                    <span className="relative">
+                    <span className="relative flex shrink-0 items-center justify-center">
                       <Avatar className="h-7 w-7 ring-2 ring-blue-500/30">
                         <AvatarImage src={session.user.image ?? ""} alt={session.user.name ?? ""} />
                         <AvatarFallback className="bg-gradient-to-br from-blue-600 to-violet-600 text-xs text-white">
@@ -264,7 +264,7 @@ export function AppShell({ children }: AppShellProps) {
                         </AvatarFallback>
                       </Avatar>
                     </span>
-                    <span className="hidden text-sm sm:inline">{session.user.name ?? "Profile"}</span>
+                    <span className="hidden text-sm sm:ml-2 sm:inline">{session.user.name ?? "Profile"}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="glass-card w-52 border-white/10">

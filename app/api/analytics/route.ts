@@ -3,7 +3,7 @@ import { listGeneratedVariants } from "@/lib/server-store";
 import { env } from "@/lib/env";
 import { adminDb } from "@/lib/firebase-admin";
 import { getUserBillingSummary } from "@/lib/subscription";
-import { getSystemUserId } from "@/lib/system-user";
+import { getSystemUserId, getCurrentWorkspaceId } from "@/lib/system-user";
 import type { TimetableSlot } from "@/lib/types";
 
 function normalizeSlots(raw: unknown): TimetableSlot[] {
@@ -39,46 +39,68 @@ export async function GET(request: Request) {
   const userId = useDatabase ? await getSystemUserId() : null;
 
   if (useDatabase && userId) {
-    const billingSummary = await getUserBillingSummary(userId);
-    const historicalEnabled = billingSummary.features.historicalAnalytics;
+    try {
+      const billingSummary = await getUserBillingSummary(userId);
+      const historicalEnabled = billingSummary.features.historicalAnalytics;
 
-    const variantsSnapshot = await adminDb
-      .collection("timetableVariants")
-      .where("userId", "==", userId)
-      .orderBy("createdAt", "asc")
-      .get();
+      const workspaceId = await getCurrentWorkspaceId();
+      const isPersonal = workspaceId === userId;
 
-    const effectiveVariants = variantsSnapshot.docs.map((doc, index) => {
-      const variant = doc.data();
-      return {
-        id: doc.id,
-        name: getVariantDisplayName(variant.name, index),
-        score: variant.score,
-        slots: normalizeSlots(variant.slots),
-      };
-    });
+      const variantsSnapshot = await (isPersonal
+        ? adminDb.collection("timetableVariants").where("userId", "==", userId).get()
+        : adminDb.collection("timetableVariants").where("workspaceId", "==", workspaceId).get());
 
-    const metrics = effectiveVariants.map((variant, idx) => ({
-      variantId: variant.id,
-      utilization: Math.min(100, variant.score + 5),
-      roomBalance: Math.max(50, variant.score - 8),
-      facultyLoad: Math.max(55, variant.score - 5 + (idx % 3) * 3),
-      clashCount: variant.score > 90 ? 0 : 1,
-    }));
+      const effectiveVariants = variantsSnapshot.docs
+        .map((doc) => ({ id: doc.id, ...doc.data() }))
+        .sort((a: any, b: any) => {
+          const getMs = (val: any) => {
+            if (!val) return 0;
+            if (typeof val.toMillis === "function") return val.toMillis();
+            if (val instanceof Date) return val.getTime();
+            if (typeof val === "string" || typeof val === "number") return new Date(val).getTime();
+            return 0;
+          };
+          return getMs(a.createdAt) - getMs(b.createdAt);
+        })
+        .map((variant: any, index) => {
+          return {
+            id: variant.id,
+            name: getVariantDisplayName(variant.name, index),
+            score: variant.score || 0,
+            slots: normalizeSlots(variant.slots),
+          };
+        });
 
-    return NextResponse.json({
-      historicalEnabled,
-      metrics,
-      variants: effectiveVariants.map((variant) => ({
-        id: variant.id,
-        name: variant.name,
-      })),
-      variantSlots: effectiveVariants.map((variant) => ({
-        id: variant.id,
-        name: variant.name,
-        slots: variant.slots,
-      })),
-    });
+      const metrics = effectiveVariants.map((variant, idx) => ({
+        variantId: variant.id,
+        utilization: Math.min(100, variant.score + 5),
+        roomBalance: Math.max(50, variant.score - 8),
+        facultyLoad: Math.max(55, variant.score - 5 + (idx % 3) * 3),
+        clashCount: variant.score > 90 ? 0 : 1,
+      }));
+
+      return NextResponse.json({
+        historicalEnabled,
+        metrics,
+        variants: effectiveVariants.map((variant) => ({
+          id: variant.id,
+          name: variant.name,
+        })),
+        variantSlots: effectiveVariants.map((variant) => ({
+          id: variant.id,
+          name: variant.name,
+          slots: variant.slots,
+        })),
+      });
+    } catch (error) {
+      console.error("Analytics API Error:", error);
+      return NextResponse.json({
+        historicalEnabled: false,
+        metrics: [],
+        variants: [],
+        variantSlots: [],
+      });
+    }
   }
 
   if (useDatabase && !guestScopeRequested) {

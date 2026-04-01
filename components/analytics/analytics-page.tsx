@@ -564,17 +564,17 @@ export function AnalyticsPage() {
   const chartAreaClass = "chart-clean rounded-md bg-transparent";
 
   const peakChartMinWidth = useMemo(
-    () => Math.max(420, peakHoursBreakdown.length * 92),
+    () => Math.max(500, peakHoursBreakdown.length * 92),
     [peakHoursBreakdown.length]
   );
 
   const roomChartMinWidth = useMemo(
-    () => Math.max(420, roomBreakdown.length * 96),
+    () => Math.max(500, roomBreakdown.length * 96),
     [roomBreakdown.length]
   );
 
   const allVariantsMinWidth = useMemo(
-    () => Math.max(100 + filteredData.length * 100, 300), // Increased min width per item
+    () => Math.max(200 + filteredData.length * 120, 500),
     [filteredData.length]
   );
   const facultyChartMinWidth = useMemo(() => {
@@ -584,7 +584,7 @@ export function AnalyticsPage() {
       0
     );
     const widthPerBar = longestFacultyName > 16 ? 92 : longestFacultyName > 12 ? 80 : 68;
-    return Math.max(420, facultyBreakdown.length * widthPerBar);
+    return Math.max(500, facultyBreakdown.length * widthPerBar);
   }, [allVariantsMinWidth, facultyBreakdown, isSingleVariantView]);
   const hasAnalyticsData = metrics.length > 0;
 
@@ -658,7 +658,7 @@ export function AnalyticsPage() {
               >
                 {isSingleVariantView ? (
                   <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden">
-                    <div className="h-full" style={{ minWidth: "480px" }}>
+                    <div className="h-full" style={{ minWidth: "500px" }}>
                       <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={200}>
                     <BarChart data={singleOverviewData} barCategoryGap={28}>
                       <defs>
