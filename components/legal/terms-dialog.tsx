@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { APP_NAME } from "@/lib/constants";
 import { TERMS_LAST_UPDATED, TermsContent } from "@/components/legal/terms-content";
 
 interface TermsDialogProps {
@@ -25,7 +26,7 @@ export function TermsDialog({
   open,
   onOpenChange,
   onAccept,
-  title = "Schedulr AI Terms and Conditions",
+  title = `${APP_NAME} Terms and Conditions`,
   description = "Please read and accept before continuing.",
   acceptLabel = "I have read and agree",
 }: TermsDialogProps) {
@@ -71,6 +72,5 @@ export function TermsDialog({
     </Dialog>
   );
 }
-
 
 

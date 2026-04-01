@@ -12,8 +12,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Schedulr AI | Timetable Scheduler",
-    template: "%s | Schedulr AI",
+    default: "TimetabiQ | AI Timetable Scheduler",
+    template: "%s | TimetabiQ",
   },
   description:
     "Professional AI-powered timetable scheduling with dashboard analytics, exports, notifications, and billing.",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     "scheduler dashboard",
   ],
   openGraph: {
-    title: "Schedulr AI",
+    title: "TimetabiQ",
     description: "AI-powered timetable scheduling platform.",
     type: "website",
   },
@@ -51,5 +51,4 @@ export default function RootLayout({
     </html>
   );
 }
-
 

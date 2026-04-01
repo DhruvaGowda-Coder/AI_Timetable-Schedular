@@ -1,7 +1,7 @@
 import type { NavItem, PricingTier, SchedulerConstraints } from "@/lib/types";
 import { createDefaultSlotTimings } from "@/lib/scheduler-utils";
 
-export const APP_NAME = "Schedulr AI";
+export const APP_NAME = "TimetabiQ";
 
 export const APP_NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard" },
@@ -112,5 +112,4 @@ export const PRICING_TIERS: PricingTier[] = [
     ],
   },
 ];
-
 

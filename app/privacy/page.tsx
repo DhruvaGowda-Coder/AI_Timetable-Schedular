@@ -1,45 +1,29 @@
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Metadata } from "next";
+import { LegalPageShell } from "@/components/legal/legal-page-shell";
+import {
+  PRIVACY_EFFECTIVE_DATE,
+  PRIVACY_LAST_UPDATED,
+  privacyContactContent,
+  privacySections,
+  privacySummary,
+} from "@/components/legal/privacy-content";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Privacy Policy for using TimetabiQ.",
+};
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-3xl space-y-6 px-4 py-8 lg:py-12">
-      <Link
-        href="/terms"
-        prefetch
-        className="inline-flex items-center gap-2 text-sm font-medium text-secondary hover:underline"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to terms
-      </Link>
-
-      <Card className="surface-card">
-        <CardHeader>
-          <CardTitle>Privacy Policy</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-sm text-brand-text-secondary">
-          <p>
-            Your privacy matters to us. We collect only the data required to provide scheduling,
-            authentication, billing, and support functionality.
-          </p>
-          <p>
-            We use secure third-party providers such as Stripe for payments and do not store full
-            payment card details on our servers.
-          </p>
-          <p>
-            If you need full privacy policy text, contact us at
-            {" "}
-            <a className="font-medium text-secondary hover:underline" href="mailto:dhruvagowda2006@gmail.com">
-              dhruvagowda2006@gmail.com
-            </a>
-            .
-          </p>
-        </CardContent>
-      </Card>
-    </div>
+    <LegalPageShell
+      title="Privacy Policy"
+      label="Data & Privacy"
+      effectiveDate={PRIVACY_EFFECTIVE_DATE}
+      lastUpdated={PRIVACY_LAST_UPDATED}
+      summary={privacySummary}
+      sections={privacySections}
+      contactTitle="Contact the Privacy Team"
+      contactBody={privacyContactContent}
+    />
   );
 }
-
-
-

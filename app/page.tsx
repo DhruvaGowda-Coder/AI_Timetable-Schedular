@@ -272,18 +272,29 @@ export default async function HomePage() {
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
         <div className="mx-auto grid w-full max-w-content gap-6 px-4 py-10 text-sm lg:grid-cols-2 lg:px-6">
           <div>
-            <p className="text-base font-semibold text-brand-text">{APP_NAME}</p>
+            <SiteLogo className="px-0" />
             <p className="mt-2 max-w-sm text-brand-text-secondary">
               Intelligent timetable and classroom scheduling platform for universities.
               Powered by advanced AI algorithms.
             </p>
+            <div className="mt-4 flex flex-wrap items-center gap-4 text-sm text-brand-text-secondary">
+              <Link href="/terms" prefetch className="transition-colors hover:text-brand-text">
+                Terms
+              </Link>
+              <Link href="/privacy" prefetch className="transition-colors hover:text-brand-text">
+                Privacy
+              </Link>
+            </div>
           </div>
           <div>
             <p className="font-semibold text-brand-text">Support</p>
-            <p className="mt-2 flex items-center gap-2 text-brand-text-secondary transition-colors hover:text-brand-text">
+            <a
+              href="mailto:dhruvagowda2006@gmail.com"
+              className="mt-2 flex items-center gap-2 text-brand-text-secondary transition-colors hover:text-brand-text"
+            >
               <Mail className="h-4 w-4 text-blue-400" />
               dhruvagowda2006@gmail.com
-            </p>
+            </a>
             <p className="mt-1.5 flex items-center gap-2 text-brand-text-secondary transition-colors hover:text-brand-text">
               <Phone className="h-4 w-4 text-violet-400" />
               Phone / WhatsApp: +91 9686437883
@@ -291,12 +302,10 @@ export default async function HomePage() {
           </div>
         </div>
         <div className="border-t border-white/5 py-4 text-center text-xs text-brand-muted">
-          © {new Date().getFullYear()} {APP_NAME}. All rights reserved.
+          &copy; {new Date().getFullYear()} {APP_NAME}. All rights reserved.
         </div>
       </footer>
       <ScrollToTop />
     </div>
   );
 }
-
-

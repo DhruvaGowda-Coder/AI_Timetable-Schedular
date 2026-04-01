@@ -2,8 +2,8 @@ import { type MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Schedulr AI",
-    short_name: "Schedulr",
+    name: "TimetabiQ",
+    short_name: "TimetabiQ",
     description: "AI-powered timetable scheduling with analytics and exports.",
     start_url: "/",
     display: "standalone",
@@ -19,5 +19,4 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
   };
 }
-
 
