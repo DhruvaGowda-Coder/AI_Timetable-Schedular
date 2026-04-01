@@ -276,12 +276,17 @@ export async function getUserBillingSummary(
     const subSnapshot = await adminDb
       .collection("subscriptions")
       .where("userId", "==", userId)
-      .orderBy("updatedAt", "desc")
-      .limit(1)
       .get();
       
     if (!subSnapshot.empty) {
-      subscription = subSnapshot.docs[0].data();
+      const sortedSubs = [...subSnapshot.docs]
+        .map(doc => doc.data())
+        .sort((a, b) => {
+          const aTime = a.updatedAt?.toMillis?.() ?? 0;
+          const bTime = b.updatedAt?.toMillis?.() ?? 0;
+          return bTime - aTime;
+        });
+      subscription = sortedSubs[0];
     }
   } catch (error) {
     console.error("Firebase read error for billing summary", error);

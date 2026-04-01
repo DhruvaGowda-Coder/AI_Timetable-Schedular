@@ -247,12 +247,17 @@ export async function POST(request: Request) {
       const limit = billingSummary.features.versionHistory ? 10 : 3;
       const historyQuery = await adminDb.collection("timetable_history")
         .where("workspaceId", "==", workspaceId || userId!)
-        .orderBy("createdAt", "desc")
         .get();
       
+      const sortedHistory = [...historyQuery.docs].sort((a, b) => {
+        const aVal = a.data().createdAt?.toMillis?.() ?? 0;
+        const bVal = b.data().createdAt?.toMillis?.() ?? 0;
+        return bVal - aVal;
+      });
+
       // We will add 1 new history, so if it has >= limit, we delete starting from index limit - 1
-      if (historyQuery.size >= limit) {
-        const docsToDelete = historyQuery.docs.slice(limit - 1);
+      if (sortedHistory.length >= limit) {
+        const docsToDelete = sortedHistory.slice(limit - 1);
         docsToDelete.forEach(doc => batch.delete(doc.ref));
       }
 
