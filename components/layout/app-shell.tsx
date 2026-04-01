@@ -207,8 +207,10 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* ── GLASSMORPHISM HEADER ── */}
       <header className="glass-card sticky top-0 z-30 rounded-none border-x-0 border-t-0">
-        <div className="mx-auto flex w-full max-w-content items-center justify-between gap-4 px-4 py-3 lg:px-6">
-          <SiteLogo />
+        <div className="mx-auto flex w-full max-w-content items-center justify-between gap-2 px-3 py-3 sm:gap-4 sm:px-4 lg:px-6">
+          <div className="min-w-0 shrink">
+            <SiteLogo />
+          </div>
 
           {/* Desktop nav with animated pill */}
           <nav className="hidden items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.03] p-1 backdrop-blur-sm md:flex">
@@ -246,7 +248,7 @@ export function AppShell({ children }: AppShellProps) {
             })}
           </nav>
 
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             {session?.user && <WorkspaceSwitcher />}
             <ThemeToggle />
             {session?.user ? (

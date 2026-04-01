@@ -645,7 +645,7 @@ export function AnalyticsPage() {
               Single graph showing all key metrics together.
             </p>
           </CardHeader>
-          <CardContent className={`h-[280px] ${chartAreaClass}`}>
+          <CardContent className={`h-[300px] sm:h-[280px] overflow-hidden ${chartAreaClass}`}>
             {loading ? (
               <Skeleton className="h-full w-full rounded-md" />
             ) : (
@@ -702,8 +702,8 @@ export function AnalyticsPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden">
-                    <div className="h-full" style={{ minWidth: `${allVariantsMinWidth}px` }}>
+                  <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden -mx-2 px-2">
+                    <div className="h-full" style={{ minWidth: `${Math.max(allVariantsMinWidth, 500)}px` }}>
                       <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={200}>
                         <BarChart data={filteredData} barCategoryGap={18}>
                           <defs>
@@ -806,7 +806,7 @@ export function AnalyticsPage() {
       </motion.div>
 
       <motion.div
-        className="grid gap-4 lg:grid-cols-3"
+        className="grid gap-4 grid-cols-1 lg:grid-cols-3"
         initial="hidden"
         animate="visible"
         variants={{
@@ -829,11 +829,11 @@ export function AnalyticsPage() {
                   : `Average: ${averages.facultyLoad}%`}
               </p>
             </CardHeader>
-            <CardContent className={`h-[210px] w-full min-w-0 p-0 sm:p-6 sm:pt-0 ${chartAreaClass}`}>
+            <CardContent className={`h-[260px] sm:h-[210px] w-full min-w-0 overflow-hidden p-2 sm:p-6 sm:pt-0 ${chartAreaClass}`}>
               {loading ? (
                 <Skeleton className="h-full w-full rounded-md" />
               ) : (
-                <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden px-4 sm:px-0">
+                <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden">
                   <div
                     className="h-full"
                     style={{
@@ -915,11 +915,11 @@ export function AnalyticsPage() {
                   : `Average: ${averages.peakHours}%`}
               </p>
             </CardHeader>
-            <CardContent className={`h-[210px] w-full min-w-0 p-0 sm:p-6 sm:pt-0 ${chartAreaClass}`}>
+            <CardContent className={`h-[260px] sm:h-[210px] w-full min-w-0 overflow-hidden p-2 sm:p-6 sm:pt-0 ${chartAreaClass}`}>
               {loading ? (
                 <Skeleton className="h-full w-full rounded-md" />
               ) : (
-                <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden px-4 sm:px-0">
+                <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden">
                   <div
                     className="h-full"
                     style={{
@@ -1026,11 +1026,11 @@ export function AnalyticsPage() {
                   : `Average: ${averages.roomOccupation}%`}
               </p>
             </CardHeader>
-            <CardContent className={`h-[210px] w-full min-w-0 p-0 sm:p-6 sm:pt-0 ${chartAreaClass}`}>
+            <CardContent className={`h-[260px] sm:h-[210px] w-full min-w-0 overflow-hidden p-2 sm:p-6 sm:pt-0 ${chartAreaClass}`}>
               {loading ? (
                 <Skeleton className="h-full w-full rounded-md" />
               ) : (
-                <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden px-4 sm:px-0">
+                <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden">
                   <div
                     className="h-full"
                     style={{
