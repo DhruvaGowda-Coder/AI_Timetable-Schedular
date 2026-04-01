@@ -96,7 +96,7 @@ export function WorkspaceSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="h-9 w-[160px] max-w-[160px] justify-between truncate rounded-md border-white/10 bg-white/5 px-3 text-sm backdrop-blur-sm transition-all hover:bg-white/10"
+          className="h-9 w-[120px] sm:w-[160px] max-w-[160px] justify-between truncate rounded-md border-white/10 bg-white/5 px-2 sm:px-3 text-xs sm:text-sm backdrop-blur-sm transition-all hover:bg-white/10"
         >
           <span className="truncate">{activeLabel}</span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

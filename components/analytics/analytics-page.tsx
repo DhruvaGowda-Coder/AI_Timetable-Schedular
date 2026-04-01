@@ -574,7 +574,7 @@ export function AnalyticsPage() {
   );
 
   const allVariantsMinWidth = useMemo(
-    () => Math.max(200 + filteredData.length * 120, 500),
+    () => Math.max(60 + filteredData.length * 100, 280),
     [filteredData.length]
   );
   const facultyChartMinWidth = useMemo(() => {
@@ -703,7 +703,7 @@ export function AnalyticsPage() {
                   </div>
                 ) : (
                   <div className="thin-scrollbar h-full w-full overflow-x-auto overflow-y-hidden -mx-2 px-2">
-                    <div className="h-full" style={{ minWidth: `${Math.max(allVariantsMinWidth, 500)}px` }}>
+                    <div className="h-full" style={{ minWidth: `${allVariantsMinWidth}px` }}>
                       <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0} debounce={200}>
                         <BarChart data={filteredData} barCategoryGap={18}>
                           <defs>
@@ -731,6 +731,7 @@ export function AnalyticsPage() {
                             fontSize={11}
                             tickLine={false}
                             axisLine={false}
+                            interval={0}
                           />
                           <YAxis domain={[0, 100]} stroke={chartColors.axis} fontSize={11} tickLine={false} axisLine={false} />
                           <ReferenceLine y={0} stroke={chartColors.axis} strokeWidth={1.25} shapeRendering="crispEdges" />
