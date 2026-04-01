@@ -44,11 +44,11 @@ export async function GET(request: Request) {
       const historicalEnabled = billingSummary.features.historicalAnalytics;
 
       const workspaceId = await getCurrentWorkspaceId();
-      const isPersonal = workspaceId === userId;
 
-      const variantsSnapshot = await (isPersonal
-        ? adminDb.collection("timetableVariants").where("userId", "==", userId).get()
-        : adminDb.collection("timetableVariants").where("workspaceId", "==", workspaceId).get());
+      const variantsSnapshot = await adminDb
+        .collection("timetableVariants")
+        .where("workspaceId", "==", workspaceId || userId)
+        .get();
 
       const effectiveVariants = variantsSnapshot.docs
         .map((doc) => ({ id: doc.id, ...doc.data() }))

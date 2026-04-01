@@ -412,7 +412,15 @@ export function AnalyticsPage() {
   }, [analyticsScope, status]);
 
   const chartData = useMemo(() => {
-    return metrics.map((item, index) => {
+    // Deduplicate metrics by variantId to prevent repeated variant labels
+    const seen = new Set<string>();
+    const uniqueMetrics = metrics.filter((item) => {
+      if (seen.has(item.variantId)) return false;
+      seen.add(item.variantId);
+      return true;
+    });
+
+    return uniqueMetrics.map((item, index) => {
       const variantName = variants.find((variant) => variant.id === item.variantId)?.name ?? "";
       const variantLabel = normalizeVariantName(variantName, index);
       const roomOccupation = Math.max(0, Math.min(100, item.roomBalance));
