@@ -1,35 +1,33 @@
-# Schedulr AI
+# TimetabiQ
 
-Professional AI timetable scheduler built with Next.js App Router, Tailwind, shadcn/ui, Framer Motion, Prisma, NextAuth, Recharts, FullCalendar, and Stripe.
+AI-powered timetable management software for schools, colleges, and universities.  
+Built with Next.js 15 App Router, Tailwind CSS, Firebase Firestore, NextAuth, LemonSqueezy, and Razorpay.
 
-## Included routes
+## Routes
 
-- `/`
-- `/dashboard`
-- `/scheduler`
-- `/analytics`
-- `/notifications`
-- `/billing`
-- `/profile`
-- `/login`
-- `/signup`
-- `/forgot-password`
+- `/` — Landing page (public)
+- `/dashboard` — Dashboard with stats, calendar, activity
+- `/scheduler` — Timetable generation with constraint editor
+- `/analytics` — Faculty workload & room utilization charts
+- `/notifications` — In-app notifications
+- `/billing` — Subscription management (LemonSqueezy + Razorpay)
+- `/profile` — User profile settings
+- `/login` / `/signup` / `/forgot-password` — Authentication flows
+- `/university-timetable-software` — SEO pillar page
+- `/ai-scheduling-software` — SEO pillar page
 
 ## Stack
 
-- Next.js 15 + TypeScript
-- Tailwind CSS + `tailwindcss-animate`
-- shadcn/ui components
-- Framer Motion
-- PostgreSQL + Prisma schema
-- NextAuth (Google + credentials + OTP endpoints)
-- FullCalendar
-- Recharts
-- jsPDF + `jspdf-autotable`
-- SheetJS (`xlsx-js-style`)
-- Stripe Checkout + Webhook routes
+- **Framework**: Next.js 15 + TypeScript
+- **Styling**: Tailwind CSS + shadcn/ui + Framer Motion
+- **Database**: Firebase Firestore (Admin SDK)
+- **Auth**: NextAuth v4 (Google OAuth + Credentials + OTP)
+- **Payments**: LemonSqueezy (international USD) + Razorpay (India INR)
+- **AI**: Groq API for AI explanations
+- **Charts**: Recharts + FullCalendar
+- **Exports**: jsPDF + xlsx-js-style
 
-## Run locally
+## Run Locally
 
 1. Install dependencies:
 
@@ -37,100 +35,91 @@ Professional AI timetable scheduler built with Next.js App Router, Tailwind, sha
 npm install
 ```
 
-2. Configure environment:
+2. Configure environment — copy `.env.local` and fill in your credentials:
 
 ```bash
-copy .env.example .env.local
+# Required variables:
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>
+
+GOOGLE_CLIENT_ID=<from Google Cloud Console>
+GOOGLE_CLIENT_SECRET=<from Google Cloud Console>
+
+FIREBASE_PROJECT_ID=<your project id>
+FIREBASE_CLIENT_EMAIL=<service account email>
+FIREBASE_PRIVATE_KEY=<service account private key>
+
+GROQ_API_KEY=<from Groq dashboard>
+
+LEMON_SQUEEZY_API_KEY=<from LemonSqueezy>
+LEMON_SQUEEZY_STORE_ID=<your store id>
+LEMON_SQUEEZY_WEBHOOK_SECRET=<your webhook secret>
+
+RAZORPAY_KEY_ID=<from Razorpay dashboard>
+RAZORPAY_KEY_SECRET=<from Razorpay dashboard>
+RAZORPAY_WEBHOOK_SECRET=<your webhook secret>
 ```
 
-3. Generate Prisma client:
-
-```bash
-npm run prisma:generate
-```
-
-4. Start development server:
+3. Start development server:
 
 ```bash
 npm run dev
 ```
 
-## Pre-deploy check
+## Pre-deploy Check
 
-Run this before deploying to a real server:
+Run before deploying to production:
 
 ```bash
 npm run predeploy:check
 ```
 
-It validates critical env configuration (database/auth/SMTP/Stripe) and fails on partial or unsafe setup.
+Validates critical environment configuration and fails on partial or unsafe setup.
 
-## Clean generated files
-
-If project size grows due to local build artifacts, run:
+## Clean Build Artifacts
 
 ```bash
 npm run clean
 ```
 
-This removes `.next`, `.next-dev`, and `tsconfig.tsbuildinfo`.
+Removes `.next`, `.next-dev`, and `tsconfig.tsbuildinfo`.
 
-## Auth and OTP
+## Subscription Model
 
-- Configure `DATABASE_URL` before using signup/login/password reset.
-- Configure SMTP values in `.env` (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM_EMAIL`) for OTP delivery.
+| Plan | USD/mo | INR/mo | Features |
+|------|--------|--------|----------|
+| Free | $0 | ₹0 | 1 seat, 3 variants, watermarked PDF, ads |
+| Pro | $19 | ₹1,499 | Unlimited variants, Excel export, AI explanations, no ads |
+| Department | $59 | ₹4,999 | 3 seats, white label PDF, onboarding wizard |
+| Institution | $129 | ₹9,999 | 10 seats, historical analytics, bulk generation, priority support |
 
-## Stripe setup (test mode)
+## Webhook Setup
 
-1. Set these env vars:
+### LemonSqueezy
+- Endpoint: `POST /api/lemonsqueezy/webhook`
+- Events: `subscription_created`, `subscription_updated`, `subscription_cancelled`, `subscription_expired`, `subscription_resumed`
 
-```bash
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_PRICE_BASIC_MONTHLY=price_...
-STRIPE_PRICE_BASIC_YEARLY=price_...
-STRIPE_PRICE_PREMIUM_MONTHLY=price_...
-STRIPE_PRICE_PREMIUM_YEARLY=price_...
-NEXTAUTH_URL=https://your-domain
-```
+### Razorpay
+- Endpoint: `POST /api/razorpay/webhook`
+- Events: `subscription.activated`, `subscription.charged`, `subscription.cancelled`, `subscription.completed`, `subscription.expired`, `subscription.halted`
 
-2. In Stripe, create recurring monthly and yearly prices for Basic and Premium, then copy IDs into the four `STRIPE_PRICE_*` variables above.
-3. Configure webhook endpoint `POST /api/stripe/webhook` and subscribe to:
-   - `checkout.session.completed`
-   - `customer.subscription.created`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-   - `invoice.paid`
-   - `invoice.payment_failed`
-4. Enable and configure Stripe Billing Portal in the Stripe Dashboard (used by `POST /api/stripe/portal`).
-5. Test the flow from `/billing` using Stripe test cards (for example, `4242 4242 4242 4242`).
+## API Endpoints
 
-## Subscription model (implemented)
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/scheduler/generate` | Optional | Generate timetable variants |
+| GET | `/api/dashboard` | Session | Dashboard stats |
+| GET/POST | `/api/billing` | Session | Billing summary / plan switch (dev) |
+| POST | `/api/scheduler/emergency` | Session | Emergency rescheduling |
+| POST | `/api/scheduler/explain` | Session | AI conflict explanations |
+| POST | `/api/export` | Session | PDF/Excel export |
+| GET | `/api/health` | None | Health check |
 
-- Free: ad-supported, up to 3 variants/generation, single PDF/Excel export, current analytics.
-- Basic: ad-free, up to 7 variants/generation, advanced constraints, bulk PDF/Excel ZIP export.
-- Premium: ad-free, unlimited variants, Excel import, emergency rescheduling, historical analytics, priority support.
-- No free trial. Users start on Free and can upgrade anytime.
-- No refunds for paid plans.
+## Security
 
-## Supabase table readability
-
-- Table descriptions are documented in `docs/supabase-table-guide.md`.
-- If your DB is already running and only the `Payment` table is missing, run `scripts/supabase-payment-table.sql` in Supabase SQL Editor.
-
-## Project summary
-
-Schedulr AI is a full-stack timetable management platform that combines schedule generation, analytics, authentication, and billing in one product. It is designed for departments and institutions that need faster timetable planning with fewer manual conflicts.
-
-The system supports multi-variant generation, plan-based feature controls, and operational dashboards for decision making. It also includes deployment-focused checks so environment issues are caught early.
-
-## Resume highlights
-
-- Built a production-ready SaaS timetable platform using Next.js 15, TypeScript, Prisma, PostgreSQL, and Stripe.
-- Implemented multi-variant timetable generation and comparison workflows to improve planning speed and quality.
-- Developed analytics dashboards for faculty load, room occupation, utilization, and peak-hour trends using Recharts.
-- Integrated authentication flows with NextAuth, OTP support, and protected API routes.
-- Added subscription lifecycle support with Stripe Checkout, webhook handling, and feature gating by plan.
-- Enforced release quality with linting, type checks, build verification, and predeploy environment validation.
-
-
+- JWT-based sessions via NextAuth
+- HMAC SHA-256 webhook signature verification (timing-safe)
+- bcrypt password + OTP hashing
+- SHA-256 API key hashing
+- Security headers (HSTS, X-Frame-Options, X-Content-Type-Options)
+- Rate limiting on generation endpoints

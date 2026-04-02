@@ -26,10 +26,10 @@ export default function UniversityTimetableSoftwarePage() {
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Button asChild variant="outline" className="rounded-lg border-brand-border/50 bg-transparent backdrop-blur-sm">
-              <Link href="/login" prefetch>Login</Link>
+              <Link href="/dashboard" prefetch>Dashboard</Link>
             </Button>
             <Button asChild className="btn-gradient rounded-lg px-5 py-2.5">
-              <Link href="/login" prefetch>Book a Demo</Link>
+              <Link href="/scheduler" prefetch>Try Scheduler</Link>
             </Button>
           </div>
         </div>
@@ -50,7 +50,7 @@ export default function UniversityTimetableSoftwarePage() {
           </p>
           <div className="flex justify-center gap-4 mt-8 flex-col sm:flex-row">
             <Button asChild size="lg" className="btn-gradient h-14 rounded-xl px-10 text-lg shadow-xl shadow-blue-500/20">
-              <Link href="/login">Request Demo <ArrowRight className="ml-2 h-5 w-5" /></Link>
+              <Link href="/dashboard">Open Dashboard <ArrowRight className="ml-2 h-5 w-5" /></Link>
             </Button>
              <Button asChild size="lg" variant="outline" className="h-14 rounded-xl px-10 text-lg bg-black/40 border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
                 <Link href="#breakdown">
@@ -127,7 +127,7 @@ export default function UniversityTimetableSoftwarePage() {
             </p>
              <div className="flex justify-center gap-4 flex-col sm:flex-row">
               <Button asChild size="lg" className="btn-gradient h-14 rounded-xl px-10 text-lg shadow-xl shadow-blue-500/20">
-                <Link href="/login">Book a Demo</Link>
+                <Link href="/scheduler">Try Scheduler</Link>
               </Button>
             </div>
             <div className="mt-8 text-emerald-400 font-semibold tracking-wide italic">Designed for modern educational institutions</div>
@@ -229,7 +229,7 @@ export default function UniversityTimetableSoftwarePage() {
           </p>
           <div className="flex justify-center gap-4 flex-col sm:flex-row shadow-2xl">
               <Button asChild size="lg" className="btn-gradient h-16 rounded-xl px-12 text-xl shadow-2xl shadow-blue-500/20 font-bold">
-                <Link href="/login">Book a Demo</Link>
+                <Link href="/dashboard">Open Dashboard</Link>
               </Button>
                <Button asChild size="lg" variant="outline" className="h-16 rounded-xl px-12 text-xl bg-black/40 border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
                 <Link href="#breakdown">

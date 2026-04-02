@@ -121,7 +121,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("Lemon Squeezy Webhook Error:", error);
-    return NextResponse.json({ message: "Webhook handler failed." }, { status: 500 });
+    // Return 200 to prevent LemonSqueezy from retrying on our internal errors
+    return NextResponse.json({ received: true });
   }
 }
 

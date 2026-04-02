@@ -22,11 +22,30 @@ export const metadata: Metadata = {
     "school scheduling",
     "college timetable",
     "scheduler dashboard",
+    "university scheduling software",
+    "timetable management software",
   ],
+  metadataBase: new URL("https://timetabiq.com"),
   openGraph: {
-    title: "TimetabiQ",
-    description: "AI-powered timetable scheduling platform.",
+    title: "TimetabiQ — AI Timetable Management Software",
+    description: "Automate academic scheduling with AI-powered timetable software for schools, colleges, and universities.",
     type: "website",
+    url: "https://timetabiq.com",
+    siteName: "TimetabiQ",
+    images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "TimetabiQ Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "TimetabiQ — AI Timetable Management Software",
+    description: "Automate academic scheduling with AI-powered timetable software for schools, colleges, and universities.",
+    images: ["/logo.png"],
   },
   icons: {
     icon: "/logo.png",

@@ -62,7 +62,7 @@ export const env = {
   SMTP_SECURE: process.env.SMTP_SECURE === "true",
   SMTP_USER: process.env.SMTP_USER ?? "",
   SMTP_PASS: process.env.SMTP_PASS ?? process.env.SMTP_PASSWORD ?? "",
-  SMTP_FROM_NAME: process.env.SMTP_FROM_NAME ?? "Schedulr AI",
+  SMTP_FROM_NAME: process.env.SMTP_FROM_NAME ?? "TimetabiQ",
   SMTP_FROM_EMAIL: process.env.SMTP_FROM_EMAIL ?? "",
   FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
   FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL,

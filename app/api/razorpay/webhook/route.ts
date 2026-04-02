@@ -19,13 +19,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Webhook secret missing." }, { status: 503 });
     }
 
-    // Verify webhook signature
+    // Verify webhook signature using timing-safe comparison
     const expectedSignature = crypto
       .createHmac("sha256", env.RAZORPAY_WEBHOOK_SECRET)
       .update(rawBody)
       .digest("hex");
 
-    if (expectedSignature !== signature) {
+    const expectedBuffer = Buffer.from(expectedSignature, "utf8");
+    const signatureBuffer = Buffer.from(signature, "utf8");
+
+    if (expectedBuffer.length !== signatureBuffer.length || !crypto.timingSafeEqual(expectedBuffer, signatureBuffer)) {
       console.error("Razorpay webhook signature mismatch");
       return NextResponse.json({ message: "Invalid signature." }, { status: 401 });
     }

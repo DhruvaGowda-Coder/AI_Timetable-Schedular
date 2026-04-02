@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { generateTimetableVariantsGA } from "@/lib/scheduler/genetic-algorithm";
 import { saveGeneratedVariants } from "@/lib/server-store";
 import { resolveUserIdFromApiKey } from "@/lib/api-keys";
@@ -127,6 +128,22 @@ const generateSchema = z.object({
 const useDatabase = env.FIREBASE_PROJECT_ID !== undefined || env.DATABASE_URL?.length > 0 !== undefined;
 
 export async function POST(request: Request) {
+  // Rate limit: 10 generation requests per minute per IP
+  const clientIp = getClientIp(request);
+  const rateLimitResult = checkRateLimit(`generate:${clientIp}`, 10, 60_000);
+  if (!rateLimitResult.allowed) {
+    return NextResponse.json(
+      { message: "Too many requests. Please try again later." },
+      {
+        status: 429,
+        headers: {
+          "Retry-After": String(Math.ceil(rateLimitResult.resetInMs / 1000)),
+          "X-RateLimit-Remaining": "0",
+        },
+      }
+    );
+  }
+
   try {
     let userId = useDatabase ? await getSystemUserId() : null;
     const apiKey = request.headers.get("x-api-key")?.trim() ?? "";
