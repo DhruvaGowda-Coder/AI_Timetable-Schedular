@@ -163,13 +163,13 @@ export default async function HomePage() {
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <Button asChild variant="outline" className="rounded-lg border-brand-border/50 bg-transparent backdrop-blur-sm">
-              <Link href="/login" prefetch>
-                Login
+              <Link href="/dashboard" prefetch>
+                Dashboard
               </Link>
             </Button>
             <Button asChild className="btn-gradient rounded-lg px-5 py-2.5">
-              <Link href="/login" prefetch>
-                Book a Demo
+              <Link href="/scheduler" prefetch>
+                Scheduler
               </Link>
             </Button>
           </div>
@@ -210,8 +210,13 @@ export default async function HomePage() {
 
             <div className="flex flex-wrap items-center gap-4 pt-4">
               <Button asChild size="lg" className="btn-gradient h-12 rounded-xl px-8 text-base shadow-xl shadow-blue-500/20">
-                <Link href="/login" prefetch>
-                  Book a Demo <ArrowRight className="ml-2 h-4 w-4" />
+                <Link href="/dashboard" prefetch>
+                  Open Dashboard <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-12 rounded-xl px-8 text-base border-white/20 hover:bg-white/5">
+                <Link href="/scheduler" prefetch>
+                  Try Scheduler
                 </Link>
               </Button>
             </div>
@@ -272,8 +277,8 @@ export default async function HomePage() {
             </div>
             <div className="pt-6 flex flex-col md:flex-row items-center gap-6">
                <Button asChild size="lg" className="btn-gradient px-8 h-12 rounded-xl shadow-lg shadow-blue-500/20">
-                 <Link href="/login">
-                   Request Demo
+                 <Link href="/scheduler">
+                   Try Scheduler
                  </Link>
                </Button>
             </div>
@@ -337,8 +342,13 @@ export default async function HomePage() {
               </p>
               <div className="flex justify-center gap-4">
                   <Button asChild size="lg" className="btn-gradient h-12 rounded-xl px-8 text-base shadow-lg shadow-blue-500/20">
-                    <Link href="/login" prefetch>
-                      Book a Demo
+                    <Link href="/dashboard" prefetch>
+                      Open Dashboard
+                    </Link>
+                  </Button>
+                  <Button asChild size="lg" variant="outline" className="h-12 rounded-xl px-8 text-base border-white/20 hover:bg-white/5">
+                    <Link href="/scheduler" prefetch>
+                      Scheduler
                     </Link>
                   </Button>
               </div>
@@ -406,8 +416,13 @@ export default async function HomePage() {
             </p>
             <div className="flex justify-center gap-4 flex-col sm:flex-row">
               <Button asChild size="lg" className="btn-gradient h-16 rounded-xl px-12 text-xl shadow-2xl shadow-blue-500/20 font-bold">
-                <Link href="/login" prefetch>
-                  Request Demo
+                <Link href="/dashboard" prefetch>
+                  Open Dashboard
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="h-16 rounded-xl px-12 text-xl shadow-2xl shadow-blue-500/20 font-bold border-white/20 hover:bg-white/5">
+                <Link href="/scheduler" prefetch>
+                  Scheduler
                 </Link>
               </Button>
             </div>
