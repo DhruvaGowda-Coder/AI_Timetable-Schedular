@@ -19,6 +19,7 @@ const serverActionAllowedOrigins = getServerActionAllowedOrigins();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  trailingSlash: false,
   // Keep development artifacts separate from production build output.
   distDir: isDev ? ".next-dev" : ".next",
   experimental: {
