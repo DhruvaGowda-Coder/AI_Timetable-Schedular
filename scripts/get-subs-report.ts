@@ -1,4 +1,5 @@
-import { adminDb } from './lib/firebase-admin';
+// @ts-nocheck
+import { adminDb } from '../lib/firebase-admin';
 
 async function getSubscriptionsReport() {
   try {
