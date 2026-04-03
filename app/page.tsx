@@ -444,7 +444,9 @@ export default async function HomePage() {
           <div className="lg:text-right">
              <Link href="/" className="mr-4 hover:text-white transition-colors">Home</Link>
              <Link href="/university-timetable-software" className="mr-4 hover:text-white transition-colors">University Software</Link>
-             <Link href="/ai-scheduling-software" className="hover:text-white transition-colors">AI Scheduling</Link>
+             <Link href="/ai-scheduling-software" className="mr-4 hover:text-white transition-colors">AI Scheduling</Link>
+             <Link href="/terms" className="mr-4 hover:text-white transition-colors">Terms of Service</Link>
+             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
           </div>
         </div>
       </footer>
