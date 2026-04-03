@@ -9,13 +9,13 @@ async function getSubscriptionsReport() {
     console.log(`Total Subs in DB: ${subsSnapshot.size}`);
     
     let activeSubs = 0;
-    const planCounts = {};
-    const statusCounts = {};
+    const planCounts: Record<string, number> = {};
+    const statusCounts: Record<string, number> = {};
 
     subsSnapshot.forEach(doc => {
       const data = doc.data();
-      const status = data.status;
-      const plan = data.plan;
+      const status = (data.status as string) || 'unknown';
+      const plan = (data.plan as string) || 'unknown';
 
       statusCounts[status] = (statusCounts[status] || 0) + 1;
       planCounts[plan] = (planCounts[plan] || 0) + 1;
