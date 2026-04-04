@@ -6,7 +6,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
 import { motion } from "framer-motion";
-import { Activity, AlertTriangle, CalendarPlus2, Sparkles, TrendingUp, BarChart3, Layers } from "lucide-react";
+import { Activity, AlertTriangle, CalendarPlus2, Sparkles, TrendingUp, BarChart3, Layers, Trash2, Calendar, RefreshCcw } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 interface CalendarEventInput {
   id?: string;
@@ -72,9 +73,10 @@ export function DashboardPage() {
   const [eventTitle, setEventTitle] = useState("");
   const [currentPlan, setCurrentPlan] = useState<PlanId>("free");
   const [switchingPlan, setSwitchingPlan] = useState<PlanId | null>(null);
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
+  const loadDashboard = async (force = false) => {
+    if (!force && typeof window !== "undefined") {
       const cached = sessionStorage.getItem(DASHBOARD_CACHE_KEY);
       if (cached) {
         try {
@@ -83,63 +85,78 @@ export function DashboardPage() {
           setActivity(parsed.activity);
           setEvents(parsed.events);
           setLoading(false);
+          // background refresh
+          fetch("/api/dashboard").then(r => r.json()).then(payload => {
+            if (payload && !payload.message) {
+              setStats(payload.stats);
+              setActivity(payload.activity);
+              setEvents(payload.events);
+              sessionStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(payload));
+            }
+          }).catch(() => {});
+          return;
         } catch {
           sessionStorage.removeItem(DASHBOARD_CACHE_KEY);
         }
       }
     }
 
-    const loadDashboard = async () => {
-      try {
-        const response = await fetch("/api/dashboard");
-        const payload = (await response.json()) as DashboardResponse;
-        if (response.ok) {
-          setStats(payload.stats);
-          setActivity(payload.activity);
-          setEvents(payload.events);
-          if (typeof window !== "undefined") {
-            sessionStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(payload));
-          }
+    setLoading(true);
+    try {
+      const response = await fetch("/api/dashboard?refresh=" + (force ? "1" : "0"));
+      const payload = (await response.json()) as DashboardResponse;
+      if (response.ok) {
+        setStats(payload.stats);
+        setActivity(payload.activity);
+        setEvents(payload.events);
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(payload));
         }
-      } catch {
-        // Keep cached dashboard data when network is slow or unavailable.
-      } finally {
-        setLoading(false);
       }
+    } catch {
+      // ignored
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const run = async () => {
+      if (typeof window !== "undefined") {
+        const needsRefresh = localStorage.getItem("schedulr.dashboard.needsRefresh");
+        if (needsRefresh === "true") {
+          localStorage.removeItem("schedulr.dashboard.needsRefresh");
+          await loadDashboard(true);
+          return;
+        }
+      }
+      await loadDashboard();
     };
-    void loadDashboard();
+    void run();
   }, []);
 
   useEffect(() => {
     if (!showAdminTestMode) return;
-
     const loadBillingPlan = async () => {
       try {
-        const response = await fetch("/api/billing?refresh=1", {
-          cache: "no-store",
-        });
-        const payload = (await response.json().catch(() => null)) as
-          | BillingSummary
-          | null;
-        if (!response.ok) return;
-        if (!isPlanId(payload?.currentPlan)) return;
-        setCurrentPlan(payload.currentPlan);
+        const response = await fetch("/api/billing?refresh=1", { cache: "no-store" });
+        const payload = (await response.json().catch(() => null)) as BillingSummary | null;
+        if (response.ok && payload && isPlanId(payload.currentPlan)) {
+          setCurrentPlan(payload.currentPlan);
+        }
       } catch {
-        // Keep default if billing lookup fails.
+        // ignored
       }
     };
-
     void loadBillingPlan();
   }, [showAdminTestMode]);
 
   async function switchPlanForTesting(plan: PlanId) {
     if (switchingPlan || plan === currentPlan) return;
-
     if (status !== "authenticated") {
       toast.error("Sign in first to use admin test mode.");
       return;
     }
-
     setSwitchingPlan(plan);
     try {
       const response = await fetch("/api/billing", {
@@ -147,30 +164,19 @@ export function DashboardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan }),
       });
-      const payload = (await response.json().catch(() => null)) as
-        | (BillingSummary & { message?: string })
-        | { message?: string }
-        | null;
-
+      const payload = (await response.json().catch(() => null));
       if (!response.ok) {
         toast.error(payload?.message ?? "Unable to switch plan.");
         return;
       }
-
-      const nextPlan = isPlanId((payload as BillingSummary | null)?.currentPlan)
-        ? (payload as BillingSummary).currentPlan
-        : plan;
+      const nextPlan = isPlanId(payload?.currentPlan) ? payload.currentPlan : plan;
       setCurrentPlan(nextPlan);
-
       if (typeof window !== "undefined") {
         sessionStorage.removeItem(BILLING_CACHE_KEY);
         for (const key of Object.keys(sessionStorage)) {
-          if (key.startsWith(ADS_CACHE_PREFIX)) {
-            sessionStorage.removeItem(key);
-          }
+          if (key.startsWith(ADS_CACHE_PREFIX)) sessionStorage.removeItem(key);
         }
       }
-
       toast.success(`Plan switched to ${nextPlan.toUpperCase()} for testing.`);
       router.refresh();
     } catch {
@@ -185,7 +191,6 @@ export function DashboardPage() {
       toast.error("Provide both date and title.");
       return;
     }
-
     const response = await fetch("/api/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -202,14 +207,51 @@ export function DashboardPage() {
     toast.success("Calendar event added.");
   }
 
+  async function deleteEvent(id: string) {
+    if (!confirm("Are you sure you want to delete this event?")) return;
+
+    try {
+      const response = await fetch(`/api/events/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        setEvents((prev) => prev.filter((e) => e.id !== id));
+        toast.success("Event deleted.");
+        // Update cache
+        if (typeof window !== "undefined") {
+          const cached = sessionStorage.getItem(DASHBOARD_CACHE_KEY);
+          if (cached) {
+            const parsed = JSON.parse(cached) as DashboardResponse;
+            parsed.events = parsed.events.filter((e) => e.id !== id);
+            sessionStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(parsed));
+          }
+        }
+      } else {
+        const data = await response.json();
+        toast.error(data.message ?? "Failed to delete event.");
+      }
+    } catch {
+      toast.error("Failed to delete event.");
+    }
+  }
+
   const action = useMemo(
     () => (
-      <Button onClick={() => setModalOpen(true)} className="btn-gradient rounded-lg px-5">
-        <CalendarPlus2 className="mr-2 h-4 w-4" />
-        Add Event
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => loadDashboard(true)}
+          className="rounded-lg border-white/10 bg-white/5 text-brand-text-secondary hover:bg-white/10"
+          title="Refresh Dashboard"
+        >
+          <RefreshCcw className={loading ? "h-4 w-4 animate-spin" : "h-4 w-4"} />
+        </Button>
+        <Button onClick={() => setModalOpen(true)} className="btn-gradient rounded-lg px-5">
+          <CalendarPlus2 className="mr-2 h-4 w-4" />
+          Add Event
+        </Button>
+      </div>
     ),
-    []
+    [loading]
   );
 
   const calendarRef = useRef<FullCalendar>(null);
@@ -222,46 +264,6 @@ export function DashboardPage() {
         action={action}
       />
 
-      {showAdminTestMode ? (
-        <div className="glass-card glow-border overflow-hidden border-dashed border-violet-500/20">
-          <div className="h-0.5 w-full bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-500" />
-          <div className="space-y-3 p-4">
-            <div>
-              <p className="text-sm font-semibold text-brand-text">
-                Admin Test Mode
-              </p>
-              <p className="text-xs text-brand-text-secondary">
-                Quickly switch subscription plan for this account to test feature access.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {(["free", "pro", "department", "institution"] as const).map((plan) => (
-                <Button
-                  key={plan}
-                  type="button"
-                  size="sm"
-                  className={
-                    currentPlan === plan
-                      ? "btn-gradient rounded-lg text-xs"
-                      : "rounded-lg border border-white/10 bg-white/5 text-xs text-brand-text-secondary hover:bg-white/10"
-                  }
-                  disabled={
-                    switchingPlan !== null ||
-                    status !== "authenticated" ||
-                    currentPlan === plan
-                  }
-                  onClick={() => void switchPlanForTesting(plan)}
-                >
-                  {switchingPlan === plan ? "Switching..." : plan.toUpperCase()}
-                </Button>
-              ))}
-              <span className="text-xs text-brand-text-secondary">
-                Current: <strong className="gradient-text">{currentPlan.toUpperCase()}</strong>
-              </span>
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       {loading ? (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -335,35 +337,115 @@ export function DashboardPage() {
         {/* Calendar */}
         <div className="glass-card glow-border overflow-hidden lg:col-span-8">
           <div className="flex items-center justify-between border-b border-white/5 p-5">
-            <h3 className="text-lg font-semibold text-brand-text">Academic Calendar</h3>
-            <Input
-              type="date"
-              className="h-8 w-[150px] rounded-lg border-white/10 bg-white/5 text-sm"
-              onChange={(e) => {
-                if (e.target.value) {
-                  const api = calendarRef.current?.getApi();
-                  api?.gotoDate(e.target.value);
-                }
-              }}
-            />
+            <div className="flex items-center gap-4">
+              <h3 className="text-lg font-semibold text-brand-text">Academic Calendar</h3>
+              <div className="flex items-center rounded-lg bg-white/5 p-1">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-7 px-3 text-xs transition-all",
+                    viewMode === "calendar" ? "bg-white/10 text-brand-text shadow-sm" : "text-brand-text-secondary hover:text-brand-text"
+                  )}
+                  onClick={() => setViewMode("calendar")}
+                >
+                  <Calendar className="mr-1.5 h-3.5 w-3.5" />
+                  Calendar
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "h-7 px-3 text-xs transition-all",
+                    viewMode === "list" ? "bg-white/10 text-brand-text shadow-sm" : "text-brand-text-secondary hover:text-brand-text"
+                  )}
+                  onClick={() => setViewMode("list")}
+                >
+                  <Activity className="mr-1.5 h-3.5 w-3.5" />
+                  List View
+                </Button>
+              </div>
+            </div>
+            {viewMode === "calendar" && (
+              <Input
+                type="date"
+                className="h-8 w-[150px] rounded-lg border-white/10 bg-white/5 text-sm"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    const api = calendarRef.current?.getApi();
+                    api?.gotoDate(e.target.value);
+                  }
+                }}
+              />
+            )}
           </div>
           <div className="thin-scrollbar overflow-x-auto p-4">
-            <FullCalendar
-              ref={calendarRef}
-              plugins={[dayGridPlugin, interactionPlugin]}
-              initialView="dayGridMonth"
-              height={520}
-              events={events}
-              dateClick={(arg: DateClickArg) => {
-                setSelectedDate(arg.dateStr);
-                setModalOpen(true);
-              }}
-              headerToolbar={{
-                left: "prev,next today",
-                center: "title",
-                right: "",
-              }}
-            />
+            {viewMode === "calendar" ? (
+              <FullCalendar
+                ref={calendarRef}
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                height={520}
+                events={events}
+                dateClick={(arg: DateClickArg) => {
+                  setSelectedDate(arg.dateStr);
+                  setModalOpen(true);
+                }}
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "",
+                }}
+                eventClick={(info) => {
+                  if (confirm(`Delete event "${info.event.title}"?`)) {
+                    deleteEvent(info.event.id);
+                  }
+                }}
+              />
+            ) : (
+              <div className="space-y-3 py-2">
+                {events.length === 0 ? (
+                  <div className="flex h-[400px] flex-col items-center justify-center text-center">
+                    <CalendarPlus2 className="mb-4 h-12 w-12 text-brand-text-secondary opacity-20" />
+                    <p className="text-sm text-brand-text-secondary">No events scheduled yet.</p>
+                  </div>
+                ) : (
+                  events
+                    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+                    .map((event) => (
+                      <div
+                        key={event.id}
+                        className="group flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-all hover:bg-white/[0.04]"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="flex h-10 w-10 flex-col items-center justify-center rounded-lg bg-gradient-to-br from-blue-500/20 to-violet-500/20 text-blue-400">
+                            <span className="text-[10px] font-bold uppercase leading-none">
+                              {format(new Date(event.start), "MMM")}
+                            </span>
+                            <span className="text-sm font-bold leading-none">
+                              {format(new Date(event.start), "d")}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-medium text-brand-text">{event.title}</p>
+                            <p className="text-xs text-brand-text-secondary">
+                              {format(new Date(event.start), "EEEE, h:mm a")}
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive opacity-0 transition-opacity group-hover:opacity-100 hover:bg-destructive/10 hover:text-destructive"
+                          onClick={() => event.id && deleteEvent(event.id)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

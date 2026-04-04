@@ -233,7 +233,7 @@ export default async function HomePage() {
                   The robust foundation for academic scheduling teams
                 </h2>
               </div>
-              <div className="space-y-4 p-8 bg-black/40">
+              <div className="space-y-4 p-8 bg-secondary/5 dark:bg-black/40">
                 {[
                   "Eliminate manual scheduling inefficiencies completely.",
                   "Resolve timetable conflicts automatically globally.",
@@ -253,9 +253,9 @@ export default async function HomePage() {
 
         {/* ── SEO CONTENT SECTION ── */}
         <ScrollReveal width="100%">
-          <section className="glass-card p-10 lg:p-14 rounded-3xl border border-white/10 mt-10 space-y-8 bg-gradient-to-br from-black/40 via-transparent to-black/40">
+          <section className="glass-card p-10 lg:p-14 rounded-3xl border border-brand-border/50 dark:border-white/10 mt-10 space-y-8 bg-gradient-to-br from-secondary/5 via-transparent to-secondary/5 dark:from-black/40 dark:to-black/40">
             <h2 className="text-3xl font-bold text-brand-text">Why Educational Institutions Need Advanced AI Timetable Management</h2>
-            <div className="prose prose-invert prose-lg max-w-none text-brand-text-secondary space-y-6">
+            <div className="prose dark:prose-invert prose-lg max-w-none text-brand-text-secondary space-y-6">
               <p>
                 In today's fast-paced educational infrastructure, strict manual scheduling has become actively detrimental. Generating mathematically sound, conflict-free schedules is unequivocally one of the most operationally intense administrative workloads for K-12 schools, expanding colleges, and multi-campus universities. Attempting to draft a college timetable system by hand inherently cascades into overlapping faculty responsibilities, neglected student course selections, and incredibly sub-optimal physical classroom space deployment. 
               </p>
@@ -288,12 +288,12 @@ export default async function HomePage() {
         {/* ── KEY INTERNAL LINKS OVERVIEW ── */}
         <ScrollReveal width="100%">
           <div className="grid md:grid-cols-2 gap-6 mt-10">
-            <Link href="/university-timetable-software" className="glass-card p-8 rounded-3xl border border-blue-500/10 hover:border-blue-500/30 transition-colors group">
-               <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">University Timetable Software &rarr;</h3>
+            <Link href="/university-timetable-software" className="glass-card p-8 rounded-3xl border border-brand-border hover:border-blue-500/30 transition-colors group">
+               <h3 className="text-2xl font-bold text-brand-text dark:text-white mb-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors">University Timetable Software &rarr;</h3>
                <p className="text-brand-text-secondary">Discover how large-scale higher education institutions manage thousands of students effortlessly with our robust software platform.</p>
             </Link>
-             <Link href="/ai-scheduling-software" className="glass-card p-8 rounded-3xl border border-violet-500/10 hover:border-violet-500/30 transition-colors group">
-               <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-violet-400 transition-colors">AI Scheduling Software &rarr;</h3>
+             <Link href="/ai-scheduling-software" className="glass-card p-8 rounded-3xl border border-brand-border hover:border-violet-500/30 transition-colors group">
+               <h3 className="text-2xl font-bold text-brand-text dark:text-white mb-2 group-hover:text-violet-500 dark:group-hover:text-violet-400 transition-colors">AI Scheduling Software &rarr;</h3>
                <p className="text-brand-text-secondary">Dive deeply into the artificial intelligence mechanisms actively resolving your most extreme operational scheduling conflicts in seconds.</p>
             </Link>
           </div>
@@ -335,8 +335,8 @@ export default async function HomePage() {
         
         {/* ── MID-PAGE CTA ── */}
         <ScrollReveal width="100%">
-            <div className="glass-card flex flex-col items-center justify-center p-12 text-center rounded-[2rem] border border-white/10 bg-gradient-to-br from-blue-900/40 via-violet-900/20 to-black">
-              <h2 className="text-3xl font-bold text-white mb-4">Transform Your Campus Scheduling Today</h2>
+            <div className="glass-card flex flex-col items-center justify-center p-12 text-center rounded-[2rem] border border-brand-border dark:border-white/10 bg-gradient-to-br from-blue-500/10 via-violet-500/10 to-transparent dark:from-blue-900/40 dark:via-violet-900/20 dark:to-black">
+              <h2 className="text-3xl font-bold text-brand-text dark:text-white mb-4">Transform Your Campus Scheduling Today</h2>
               <p className="text-brand-text-secondary mb-8 max-w-2xl text-lg mx-auto">
                 Join leading educational enterprises using our university scheduling software logically to entirely eliminate timetable conflicts instantly. Designed exclusively for modern educational institutions.
               </p>
@@ -392,9 +392,9 @@ export default async function HomePage() {
             </div>
             <div className="mx-auto max-w-3xl space-y-4">
               {faqs.map((faq, i) => (
-                <div key={i} className="bg-black/30 p-6 rounded-2xl border border-white/5 shadow-inner">
-                  <h3 className="text-lg font-bold text-white flex items-start gap-3">
-                    <HelpCircle className="h-6 w-6 text-blue-400 shrink-0 mt-0.5" />
+                <div key={i} className="bg-secondary/5 dark:bg-black/30 p-6 rounded-2xl border border-brand-border dark:border-white/5 shadow-inner">
+                  <h3 className="text-lg font-bold text-brand-text dark:text-white flex items-start gap-3">
+                    <HelpCircle className="h-6 w-6 text-blue-500 dark:text-blue-400 shrink-0 mt-0.5" />
                     {faq.question}
                   </h3>
                   <p className="mt-3 text-brand-text-secondary leading-relaxed ml-9 text-base">
@@ -408,8 +408,8 @@ export default async function HomePage() {
 
         {/* ── BOTTOM CTA ── */}
         <ScrollReveal width="100%">
-          <div className="text-center py-20 px-4 glass-card border border-blue-500/20 bg-gradient-to-t from-blue-900/40 to-black rounded-[2rem]">
-            <h2 className="text-4xl font-bold text-white mb-6">Ready to Automate Your Institution?</h2>
+          <div className="text-center py-20 px-4 glass-card border border-brand-border dark:border-blue-500/20 bg-gradient-to-t from-blue-50 to-transparent dark:from-blue-900/40 dark:to-black rounded-[2rem]">
+            <h2 className="text-4xl font-bold text-brand-text dark:text-white mb-6">Ready to Automate Your Institution?</h2>
             <p className="text-xl text-brand-text-secondary mb-10 max-w-2xl mx-auto">
               Implement scalable AI scheduling software perfectly tailored for modern schools, colleges, and university frameworks. Let's make scheduling effortless. 
               <span className="block mt-4 text-emerald-400 font-semibold italic">Designed for modern educational institutions.</span>

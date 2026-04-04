@@ -59,7 +59,7 @@ export const PRICING_TIERS: PricingTier[] = [
     features: [
       "1 Admin Seat",
       "Up to 3 variants per generation",
-      "PDF Export (Watermarked)",
+      "PDF & Excel Export",
       "Ads enabled",
     ],
   },
@@ -74,7 +74,7 @@ export const PRICING_TIERS: PricingTier[] = [
       "1 Admin Seat",
       "Unlimited variants",
       "No Watermark on PDF",
-      "Excel Export",
+      "ZIP Downloads",
       "AI Explanations",
       "Emergency Rescheduling",
       "Google Calendar Sync",

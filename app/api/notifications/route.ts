@@ -20,14 +20,20 @@ export async function GET() {
     const snapshot = await adminDb
       .collection("notifications")
       .where("userId", "==", userId)
-      .orderBy("createdAt", "desc")
       .get();
 
+    const sortedDocs = [...snapshot.docs].sort((a, b) => {
+      const aDate = a.data().createdAt?.toDate?.() || new Date(a.data().createdAt || 0);
+      const bDate = b.data().createdAt?.toDate?.() || new Date(b.data().createdAt || 0);
+      return bDate.getTime() - aDate.getTime();
+    });
+
     return NextResponse.json({
-      notifications: snapshot.docs.map((doc) => {
+      notifications: sortedDocs.map((doc) => {
         const notification = doc.data();
         let createdAtIso = notification.createdAt;
         if (createdAtIso?.toDate) createdAtIso = createdAtIso.toDate().toISOString();
+        else if (createdAtIso instanceof Date) createdAtIso = createdAtIso.toISOString();
 
         return {
           id: doc.id,

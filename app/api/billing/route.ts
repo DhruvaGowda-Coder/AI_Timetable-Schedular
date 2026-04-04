@@ -71,93 +71,105 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (process.env.NODE_ENV === "production") {
+  try {
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json(
+        { message: "Admin test mode is disabled in production." },
+        { status: 403 }
+      );
+    }
+
+    if (!useDatabase) {
+      return NextResponse.json(
+        { message: "Database is required to change plan state." },
+        { status: 503 }
+      );
+    }
+
+    const userId = await getSystemUserId();
+    if (!userId) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const payload = (await request.json().catch(() => null)) as
+      | { plan?: unknown }
+      | null;
+    const plan = parsePlanId(payload?.plan);
+    if (!plan) {
+      return NextResponse.json(
+        { message: "Invalid plan. Use free, pro, department, or institution." },
+        { status: 400 }
+      );
+    }
+
+    const nextStatus = plan === "free" ? "inactive" : "active";
+    const nextInterval =
+      plan === "free" ? null : BillingInterval.MONTHLY;
+    const nextFlags = buildUserFeatureFlags(plan);
+
+    const batch = adminDb.batch();
+    const userRef = adminDb.collection("users").doc(userId);
+
+    const updateData: any = {
+      tier: nextFlags.tier,
+      subscriptionStatus: nextStatus,
+      billingInterval: nextInterval,
+      subscriptionEnd: null,
+    };
+
+    if (plan === "free") {
+      updateData.lemonSqueezyCustomerId = null;
+      updateData.lemonSqueezySubscriptionId = null;
+    }
+
+    batch.update(userRef, updateData);
+
+    const subsSnapshot = await adminDb
+      .collection("subscriptions")
+      .where("userId", "==", userId)
+      .get();
+
+    const sortedDocs = [...subsSnapshot.docs].sort((a, b) => {
+      const aDate = a.data().updatedAt?.toDate?.() || new Date(a.data().updatedAt || 0);
+      const bDate = b.data().updatedAt?.toDate?.() || new Date(b.data().updatedAt || 0);
+      return bDate.getTime() - aDate.getTime();
+    });
+
+    const subscriptionData: any = {
+      userId,
+      plan: nextFlags.tier,
+      status: nextStatus,
+      billingInterval: nextInterval,
+      currentPeriodEnd: null,
+      updatedAt: new Date(),
+    };
+
+    if (plan === "free") {
+      subscriptionData.lemonSqueezySubscriptionId = null;
+    }
+
+    if (sortedDocs.length > 0) {
+      batch.update(sortedDocs[0].ref, subscriptionData);
+    } else {
+      subscriptionData.createdAt = new Date();
+      batch.set(adminDb.collection("subscriptions").doc(), subscriptionData);
+    }
+
+    await batch.commit();
+
+    const cacheKey = getBillingCacheKey(userId);
+    clearCachedBilling(cacheKey);
+    const updated = await getUserBillingSummary(userId);
+    setCachedBilling(cacheKey, updated);
+
+    return NextResponse.json(updated);
+  } catch (error: any) {
+    console.error("Plan switch failure:", error);
     return NextResponse.json(
-      { message: "Admin test mode is disabled in production." },
-      { status: 403 }
+      { message: `Plan switch failure: ${error.message || "Unknown error"}` },
+      { status: 500 }
     );
   }
-
-  if (!useDatabase) {
-    return NextResponse.json(
-      { message: "Database is required to change plan state." },
-      { status: 503 }
-    );
-  }
-
-  const userId = await getSystemUserId();
-  if (!userId) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
-  const payload = (await request.json().catch(() => null)) as
-    | { plan?: unknown }
-    | null;
-  const plan = parsePlanId(payload?.plan);
-  if (!plan) {
-    return NextResponse.json(
-      { message: "Invalid plan. Use free, pro, department, or institution." },
-      { status: 400 }
-    );
-  }
-
-  const nextStatus = plan === "free" ? "inactive" : "active";
-  const nextInterval =
-    plan === "free" ? null : BillingInterval.MONTHLY;
-  const nextFlags = buildUserFeatureFlags(plan);
-
-  const batch = adminDb.batch();
-  const userRef = adminDb.collection("users").doc(userId);
-
-  const updateData: any = {
-    tier: nextFlags.tier,
-    subscriptionStatus: nextStatus,
-    billingInterval: nextInterval,
-    subscriptionEnd: null,
-  };
-
-  if (plan === "free") {
-    updateData.lemonSqueezyCustomerId = null;
-    updateData.lemonSqueezySubscriptionId = null;
-  }
-
-  batch.update(userRef, updateData);
-
-  const subsSnapshot = await adminDb
-    .collection("subscriptions")
-    .where("userId", "==", userId)
-    .orderBy("updatedAt", "desc")
-    .limit(1)
-    .get();
-
-  const subscriptionData: any = {
-    userId,
-    plan: nextFlags.tier,
-    status: nextStatus,
-    billingInterval: nextInterval,
-    currentPeriodEnd: null,
-    updatedAt: new Date(),
-  };
-
-  if (plan === "free") {
-    subscriptionData.lemonSqueezySubscriptionId = null;
-  }
-
-  if (!subsSnapshot.empty) {
-    batch.update(subsSnapshot.docs[0].ref, subscriptionData);
-  } else {
-    subscriptionData.createdAt = new Date();
-    batch.set(adminDb.collection("subscriptions").doc(), subscriptionData);
-  }
-
-  await batch.commit();
-
-  const cacheKey = getBillingCacheKey(userId);
-  clearCachedBilling(cacheKey);
-  const updated = await getUserBillingSummary(userId);
-  setCachedBilling(cacheKey, updated);
-
-  return NextResponse.json(updated);
 }
 
 

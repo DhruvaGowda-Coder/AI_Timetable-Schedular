@@ -278,6 +278,18 @@ export async function POST(request: Request) {
         docsToDelete.forEach(doc => batch.delete(doc.ref));
       }
 
+      if (generatedCount > 0) {
+        const notifRef = adminDb.collection("notifications").doc();
+        batch.set(notifRef, {
+          userId: userId!,
+          title: "Timetable Generated",
+          description: `Successfully generated ${generatedCount} timetable variants with a top score of ${variants[0]?.score}%.`,
+          category: "SUCCESS",
+          isRead: false,
+          createdAt: new Date(),
+        });
+      }
+
       await batch.commit();
     }
 

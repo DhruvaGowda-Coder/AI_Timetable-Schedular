@@ -124,8 +124,8 @@ export async function GET() {
       : adminDb.collection("timetableVariants").where("workspaceId", "==", workspaceId).get();
 
     const eventsQuery = isPersonal
-      ? adminDb.collection("calendarEvents").where("userId", "==", userId).orderBy("startAt", "asc").get()
-      : adminDb.collection("calendarEvents").where("workspaceId", "==", workspaceId).orderBy("startAt", "asc").get();
+      ? adminDb.collection("calendarEvents").where("userId", "==", userId).get()
+      : adminDb.collection("calendarEvents").where("workspaceId", "==", workspaceId).get();
 
     const cacheKey = `db:${workspaceId}`;
     const cachedPayload = getCachedDashboardPayload(cacheKey);
@@ -139,14 +139,20 @@ export async function GET() {
       variantsQuery,
       eventsQuery,
       adminDb.collection("notifications").where("userId", "==", userId).where("isRead", "==", false).count().get(),
-      adminDb.collection("notifications").where("userId", "==", userId).orderBy("createdAt", "desc").limit(5).get(),
+      adminDb.collection("notifications").where("userId", "==", userId).get(),
     ]);
 
     const variantsCount = variantsSnapshot.size;
     const activeSchedulesCount = variantsSnapshot.docs.filter((doc) => doc.data().isActive).length;
     const unreadNotifications = unreadSnapshot.data().count;
 
-    const activityFeed = recentNotificationsSnapshot.docs.map((doc) => {
+    const sortedNotifications = [...recentNotificationsSnapshot.docs].sort((a, b) => {
+      const aDate = a.data().createdAt?.toDate?.() || new Date(a.data().createdAt || 0);
+      const bDate = b.data().createdAt?.toDate?.() || new Date(b.data().createdAt || 0);
+      return bDate.getTime() - aDate.getTime();
+    });
+
+    const activityFeed = sortedNotifications.slice(0, 5).map((doc) => {
       const n = doc.data();
       let createdAtDate = n.createdAt;
       if (createdAtDate?.toDate) createdAtDate = createdAtDate.toDate();
@@ -169,24 +175,30 @@ export async function GET() {
         { id: "success-rate", label: "Conflict-Free Rate", value: "N/A", trend: "No data" },
       ],
       activity: activityFeed,
-      events: eventsSnapshot.docs.map((doc) => {
-        const event = doc.data();
-        let startIso = event.startAt;
-        let endIso = event.endAt;
-        if (startIso?.toDate) startIso = startIso.toDate().toISOString();
-        if (endIso?.toDate) endIso = endIso.toDate().toISOString();
-        else if (endIso) {
-          endIso = new Date(endIso).toISOString();
-        }
+      events: [...eventsSnapshot.docs]
+        .sort((a, b) => {
+          const aDate = a.data().startAt?.toDate?.() || new Date(a.data().startAt || 0);
+          const bDate = b.data().startAt?.toDate?.() || new Date(b.data().startAt || 0);
+          return aDate.getTime() - bDate.getTime();
+        })
+        .map((doc) => {
+          const event = doc.data();
+          let startIso = event.startAt;
+          let endIso = event.endAt;
+          if (startIso?.toDate) startIso = startIso.toDate().toISOString();
+          if (endIso?.toDate) endIso = endIso.toDate().toISOString();
+          else if (endIso) {
+            endIso = new Date(endIso).toISOString();
+          }
 
-        return {
-          id: doc.id,
-          title: event.title,
-          start: startIso,
-          end: endIso ?? undefined,
-          color: event.color,
-        };
-      }),
+          return {
+            id: doc.id,
+            title: event.title,
+            start: startIso,
+            end: endIso ?? undefined,
+            color: event.color,
+          };
+        }),
       unreadNotifications,
     };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   CalendarPlus,
@@ -576,6 +577,7 @@ interface GenerateVariantsResponse {
 }
 
 export function SchedulerPage() {
+  const router = useRouter();
   const [billingPlan, setBillingPlan] = useState<PlanId>("free");
   const [billingFeatures, setBillingFeatures] = useState<PlanFeatures>(
     DEFAULT_BILLING_FEATURES
@@ -912,6 +914,9 @@ export function SchedulerPage() {
       } else {
         const countLabel = normalized.length === 1 ? "variant" : "variants";
         toast.success(`Generated ${normalized.length} ${countLabel}.`);
+        if (typeof window !== "undefined") {
+          localStorage.setItem("schedulr.dashboard.needsRefresh", "true");
+        }
       }
     } catch (error) {
       console.error("Generate request failed:", error);

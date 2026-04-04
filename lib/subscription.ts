@@ -36,7 +36,7 @@ export const PLAN_FEATURES: Record<PlanId, PlanFeatures> = {
     adminSeats: 1,
     pdfExport: true,
     pdfWatermark: true,
-    excelExport: false,
+    excelExport: true,
     aiExplanations: false,
     emergencyReschedule: false,
     analytics: false,
