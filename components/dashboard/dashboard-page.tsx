@@ -336,8 +336,8 @@ export function DashboardPage() {
 
         {/* Calendar */}
         <div className="glass-card glow-border overflow-hidden lg:col-span-8">
-          <div className="flex items-center justify-between border-b border-white/5 p-5">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col items-start justify-between gap-4 border-b border-white/5 p-4 sm:flex-row sm:items-center sm:p-5">
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
               <h3 className="text-lg font-semibold text-brand-text">Academic Calendar</h3>
               <div className="flex items-center rounded-lg bg-white/5 p-1">
                 <Button
@@ -369,7 +369,7 @@ export function DashboardPage() {
             {viewMode === "calendar" && (
               <Input
                 type="date"
-                className="h-8 w-[150px] rounded-lg border-white/10 bg-white/5 text-sm"
+                className="h-9 w-full shrink-0 rounded-lg border-white/10 bg-white/5 text-sm sm:h-8 sm:w-[150px]"
                 onChange={(e) => {
                   if (e.target.value) {
                     const api = calendarRef.current?.getApi();
