@@ -27,7 +27,7 @@ export function SiteLogo({ className }: SiteLogoProps) {
           priority
         />
       </span>
-      <span className="text-lg font-semibold tracking-tight text-brand-text">{APP_NAME}</span>
+      <span className="hidden sm:inline-block text-lg font-semibold tracking-tight text-brand-text">{APP_NAME}</span>
     </Link>
   );
 }

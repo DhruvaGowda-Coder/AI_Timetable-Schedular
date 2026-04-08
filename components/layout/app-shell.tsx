@@ -287,7 +287,7 @@ export function AppShell({ children }: AppShellProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button onClick={() => signIn()} className="btn-gradient rounded-lg px-5">
+              <Button onClick={() => signIn()} className="btn-gradient rounded-lg px-3 text-sm sm:px-5">
                 Login
               </Button>
             )}

@@ -170,10 +170,12 @@ export function CalendarExportDialog({
       }
 
       toast.success(
-        `Synced! Created calendar and added ${data.eventsCreated} events.`
+        `Synced! Created calendar and added ${data.eventsCreated} events. Redirecting...`
       );
       if (data.calendarLink) {
-        window.open(data.calendarLink, "_blank");
+        setTimeout(() => {
+          window.location.href = data.calendarLink;
+        }, 1500);
       }
     } catch (error) {
        toast.error("Network error during sync.");

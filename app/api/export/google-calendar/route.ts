@@ -35,14 +35,17 @@ export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user) {
-      return NextResponse.json({ message: "Unauthorized." }, { status: 401 });
+      return NextResponse.json(
+        { message: "Please log in to sync your schedule." },
+        { status: 401 }
+      );
     }
 
     // @ts-ignore
     const accessToken = session.accessToken;
     if (!accessToken) {
       return NextResponse.json(
-        { message: "Google Calendar access token not found. Please log in with Google again and grant Calendar permissions." },
+        { message: "Please log in with Google to enable calendar sync." },
         { status: 401 }
       );
     }
