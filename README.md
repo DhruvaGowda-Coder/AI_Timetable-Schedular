@@ -1,44 +1,91 @@
-# TimetabiQ
+# 🚀 TimetabiQ — AI Timetable Scheduler (SaaS)
 
-AI-powered timetable management software for schools, colleges, and universities.  
-Built with Next.js 15 App Router, Tailwind CSS, Firebase Firestore, NextAuth, LemonSqueezy, and Razorpay.
+AI-powered timetable management platform designed for schools, colleges, and universities to automate complex scheduling and eliminate manual errors.
 
-## Routes
+---
 
-- `/` — Landing page (public)
-- `/dashboard` — Dashboard with stats, calendar, activity
-- `/scheduler` — Timetable generation with constraint editor
-- `/analytics` — Faculty workload & room utilization charts
-- `/notifications` — In-app notifications
-- `/billing` — Subscription management (LemonSqueezy + Razorpay)
-- `/profile` — User profile settings
-- `/login` / `/signup` / `/forgot-password` — Authentication flows
-- `/university-timetable-software` — SEO pillar page
-- `/ai-scheduling-software` — SEO pillar page
+## 🌐 Live Demo
 
-## Stack
+👉 https://timetabiq.com
 
-- **Framework**: Next.js 15 + TypeScript
-- **Styling**: Tailwind CSS + shadcn/ui + Framer Motion
-- **Database**: Firebase Firestore (Admin SDK)
-- **Auth**: NextAuth v4 (Google OAuth + Credentials + OTP)
-- **Payments**: LemonSqueezy (international USD) + Razorpay (India INR)
-- **AI**: Groq API for AI explanations
-- **Charts**: Recharts + FullCalendar
-- **Exports**: jsPDF + xlsx-js-style
+---
 
-## Run Locally
+## 🎯 Problem Solved
 
-1. Install dependencies:
+Manual timetable creation is time-consuming, error-prone, and difficult to scale with multiple constraints like faculty availability, room allocation, and time slots.
+
+---
+
+## 💡 Solution
+
+TimetabiQ uses a constraint satisfaction engine combined with genetic algorithms to generate conflict-free academic timetables at scale (supporting up to 10,000 variants), reducing scheduling complexity and human errors.
+
+---
+
+## ⚙️ Key Features
+
+* AI-powered timetable generation (multi-variant)
+* Constraint editor (subjects, faculty, rooms, time slots)
+* Emergency rescheduling system
+* AI conflict explanation (Groq API)
+* PDF & Excel export with branding
+* Shareable timetable links
+* Multi-tenant SaaS architecture
+* Dual payment system (Razorpay + LemonSqueezy)
+
+---
+
+## 🧠 How It Works
+
+Input Constraints → Normalize Data → Generate Variants (Genetic Algorithm + CSP) → Score & Optimize → Output Conflict-Free Timetable
+
+---
+
+## 📊 Performance
+
+* Supports up to **10,000 timetable variants**
+* Handles **100–1,000 constraint scale**
+* Optimized for real-time generation and variant comparison
+
+---
+
+## 🏗️ Tech Stack
+
+* **Frontend**: Next.js 15, TypeScript, Tailwind CSS, Framer Motion
+* **Backend**: Node.js, API Routes
+* **Database**: Firebase Firestore (Admin SDK)
+* **Authentication**: NextAuth v4 (Google OAuth + Credentials + OTP)
+* **Payments**: LemonSqueezy (USD) + Razorpay (INR)
+* **AI**: Groq API (conflict explanations)
+* **Charts**: Recharts + FullCalendar
+* **Exports**: jsPDF, xlsx-js-style
+
+---
+
+## 🧩 System Highlights
+
+* Multi-tenant SaaS architecture
+* Guest-first usage (no login required for core features)
+* Local draft persistence + cloud sync
+* Serverless deployment (Vercel)
+* Secure webhook handling for subscriptions
+
+---
+
+## 🚀 Run Locally
 
 ```bash
 npm install
+npm run dev
 ```
 
-2. Configure environment — copy `.env.local` and fill in your credentials:
+---
+
+## 🔐 Environment Setup
+
+Create `.env.local` and configure:
 
 ```bash
-# Required variables:
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=<generate with: openssl rand -base64 32>
 
@@ -60,66 +107,41 @@ RAZORPAY_KEY_SECRET=<from Razorpay dashboard>
 RAZORPAY_WEBHOOK_SECRET=<your webhook secret>
 ```
 
-3. Start development server:
+---
 
-```bash
-npm run dev
-```
+## 📦 Subscription Model
 
-## Pre-deploy Check
+| Plan        | USD/mo | INR/mo | Features                                          |
+| ----------- | ------ | ------ | ------------------------------------------------- |
+| Free        | $0     | ₹0     | 1 seat, 3 variants, watermarked PDF, ads          |
+| Pro         | $19    | ₹1,499 | Unlimited variants, Excel export, AI explanations |
+| Department  | $59    | ₹4,999 | 3 seats, white label PDF, onboarding              |
+| Institution | $129   | ₹9,999 | 10 seats, analytics, bulk generation              |
 
-Run before deploying to production:
+---
 
-```bash
-npm run predeploy:check
-```
+## 🔗 API Highlights
 
-Validates critical environment configuration and fails on partial or unsafe setup.
+* `/api/scheduler/generate` → Generate timetable variants
+* `/api/scheduler/emergency` → Handle disruptions
+* `/api/scheduler/explain` → AI conflict explanations
+* `/api/export` → Export PDF/Excel
+* `/api/dashboard` → Analytics data
 
-## Clean Build Artifacts
+---
 
-```bash
-npm run clean
-```
+## 🔒 Security
 
-Removes `.next`, `.next-dev`, and `tsconfig.tsbuildinfo`.
+* JWT-based authentication (NextAuth)
+* HMAC SHA-256 webhook verification
+* bcrypt password & OTP hashing
+* Rate limiting on generation endpoints
+* Secure headers (HSTS, X-Frame, etc.)
 
-## Subscription Model
+---
 
-| Plan | USD/mo | INR/mo | Features |
-|------|--------|--------|----------|
-| Free | $0 | ₹0 | 1 seat, 3 variants, watermarked PDF, ads |
-| Pro | $19 | ₹1,499 | Unlimited variants, Excel export, AI explanations, no ads |
-| Department | $59 | ₹4,999 | 3 seats, white label PDF, onboarding wizard |
-| Institution | $129 | ₹9,999 | 10 seats, historical analytics, bulk generation, priority support |
+## 📌 Status
 
-## Webhook Setup
+Production-ready SaaS system with live deployment and real-world usage.
 
-### LemonSqueezy
-- Endpoint: `POST /api/lemonsqueezy/webhook`
-- Events: `subscription_created`, `subscription_updated`, `subscription_cancelled`, `subscription_expired`, `subscription_resumed`
-
-### Razorpay
-- Endpoint: `POST /api/razorpay/webhook`
-- Events: `subscription.activated`, `subscription.charged`, `subscription.cancelled`, `subscription.completed`, `subscription.expired`, `subscription.halted`
-
-## API Endpoints
-
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| POST | `/api/scheduler/generate` | Optional | Generate timetable variants |
-| GET | `/api/dashboard` | Session | Dashboard stats |
-| GET/POST | `/api/billing` | Session | Billing summary / plan switch (dev) |
-| POST | `/api/scheduler/emergency` | Session | Emergency rescheduling |
-| POST | `/api/scheduler/explain` | Session | AI conflict explanations |
-| POST | `/api/export` | Session | PDF/Excel export |
-| GET | `/api/health` | None | Health check |
-
-## Security
-
-- JWT-based sessions via NextAuth
-- HMAC SHA-256 webhook signature verification (timing-safe)
-- bcrypt password + OTP hashing
-- SHA-256 API key hashing
-- Security headers (HSTS, X-Frame-Options, X-Content-Type-Options)
-- Rate limiting on generation endpoints
+---
